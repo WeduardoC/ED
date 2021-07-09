@@ -1,0 +1,109 @@
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "colecao.h"
+#define TRUE 1
+#define FALSE 0
+#define MAX 1
+typedef struct _aluno_{
+  char nome[30];
+  int matr;
+  float nota;
+}Aluno;
+int cmpNome(void* key,void* item){
+  char *keynome;
+  Aluno* colItem;
+  keynome=(char*)malloc(sizeof(char)*30);
+  if(keynome!=NULL){
+    keynome=(char*)key;
+    colItem=(Aluno*)item;
+    if(strcmp(keynome,colItem->nome)==0){
+      //strcmp compara duas strings e retorna 0 se elas são iguais
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+int main(void) {
+  Colecao *col;
+  Aluno *a;
+  int n,aux;
+  char* name=(char*)malloc(sizeof(char)*30);
+  do{
+    printf("\ndigite 1 pra criar uma colecao\n2 pra inserir um aluno na colecao\ndigite 3 pra remover\n4 pra consultar\n5 pra listar os elementos\n6 pra destruir a colecao\n7 pra esvaziar a colecao\ndigite outro numero pra sair: ");
+    scanf("%d",&n);
+    switch(n){
+      case 1:
+        col=colCriar(MAX);
+        if(col!=NULL){
+          printf("\ncolecao criada\n");
+        }else{
+          printf("\nerro na criacao\n");
+        }       
+        break;
+      case 2:
+          for(int i=0;i<MAX;++i){
+            a=(Aluno*)malloc(sizeof(Aluno));
+            if(a!=NULL){
+              printf("\ndigite o nome matricula e nota do aluno: ");
+              scanf("%s %d %f",a->nome,&(a->matr),&(a->nota));
+              colInserir(col,(void*)a);
+            }
+          }
+        break;
+      case 3:
+        printf("\ndigite o nome que voce quer remover: ");
+        scanf("%s",name);
+        a=(Aluno*)colRetirar(col,(void*)name,cmpNome);
+        if(a!=NULL){
+          printf("%s %d %.2f",a->nome,a->matr,a->nota);
+          printf("\nitem removido\n");
+        }else{
+          printf("\nitem não encontrado\n");
+        }
+        break;
+      case 4:
+        printf("\ndigite o nome que voce quer consultar: ");
+        scanf("%s",name);
+        a=(Aluno*)colBuscar(col,(void*)name,cmpNome);
+        if(a!=NULL){
+          printf("\n%s %d %.2f\n",a->nome,a->matr,a->nota);
+        }else{
+          printf("\nitem não encontrado\n");
+        }
+        break;
+      case 5:
+        a=(Aluno*)colGetFirst(col);
+        while(a!=NULL){
+          printf("\nnome=%s matricula=%d nota=%.2f\n",a->nome,a->matr,a->nota);
+          a=(Aluno*)colGetNext(col);
+        }
+        break;
+      case 6:
+        aux=colDestruir(col);
+        if(aux==TRUE){
+          printf("\nVoce destruiu a colecao\n");
+        }else{
+          printf("\nessa colecao não existe ou não está vazia\n");
+        }
+        break;
+      case 7:
+        a=(Aluno*)colGetFirst(col);
+        while(a!=NULL){
+          Aluno *data;
+          name=a->nome;
+          data=(Aluno*)colRetirar(col,(void*)name,cmpNome);
+          a=(Aluno*)colGetNext(col);
+        }
+        printf("\na colecao foi esvaziada\n");
+        break;
+      default:
+        printf("\nsaindo do programa\n");
+        break;
+    }
+  }while(n>0 && n<8);
+  
+  return 0;
+}
